@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************
 * The MIT License (MIT)
 *
-* Copyright (c) 2014 APIMatic Inc.
+* Copyright (c) 2014 Zeeshan Ejaz Bhatti
 * Adopted from AsyncOAuth Project https://github.com/neuecc/AsyncOAuth
  * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy

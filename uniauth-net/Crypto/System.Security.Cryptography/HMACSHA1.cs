@@ -2,7 +2,7 @@
 * This license is an adaptation of the MIT X11 (http://opensource.org/licenses/mit-license.php) 
 * License and should be read as such.
 * 
-* Copyright (c) 2014 APIMatic Inc.
+* Copyright (c) 2014 Zeeshan Ejaz Bhatti
 * Adopted from The Legion of the Bouncy Castle Inc. (http://www.bouncycastle.org)
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
