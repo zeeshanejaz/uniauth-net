@@ -25,7 +25,7 @@ using System.Net.Http;
 
 namespace uniauth_net
 {
-    interface IAuthProvider
+    public interface IAuthProvider
     {
         bool AppendCredentials(HttpRequestMessage request);
     }
