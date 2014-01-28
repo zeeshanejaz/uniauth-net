@@ -29,55 +29,12 @@ using System.Collections.Generic;
 
 namespace uniauth_net.oauth2
 {
-    public class OAuth_v2_WebServerFlow : OAuth_v2_Base, IUserConsentHandler
+    public class OAuth_v2_WebServerFlow : OAuth_v2_ThreeLeggedBase, IUserConsentHandler
     {
-        private string accessTokenUrl = null;
-        private string clientSecret = null;
-
         public OAuth_v2_WebServerFlow(string clientId, string clientSecret,
             string redirectUrl, string scope, string authorizationUrl, string accessTokenUrl)
-            : base(clientId, redirectUrl, scope, authorizationUrl)
+            : base(clientId, clientSecret, redirectUrl, scope, authorizationUrl, accessTokenUrl)
         {
-            this.accessTokenUrl = accessTokenUrl;
-            this.clientSecret = clientSecret;
-        }
-
-        /// <summary>
-        /// Takes user authorization viewer and invokes the OAuth pin/oob based webserver flow
-        /// </summary>
-        /// <return>The authorization url</return>        
-        public virtual Uri GetUserTokenUrl()
-        {
-            //initialize the underlying OAuthorizer
-            initOAuthorizer(clientSecret);
-
-            base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
-            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.RESPONSE_TYPE_CODE);
-            return new Uri(authorizeUrlResponse);
-        }
-
-        /// <summary>
-        /// The resultant callback url to process as the result of authorization.
-        /// </summary>
-        /// <param name="authorizedUrl">The return url sent back with key and secret</param>
-        /// <returns>True if the process of authorization was successful</returns>
-        public async virtual Task<bool> ProcessUserAuthorizationAsync(string verifier)
-        {
-            OAuthState = OAuthState.ACCESS_TOKEN_WAIT;
-            authToken = new AuthToken(verifier, null);
-            var result = await oauthorizer.GetAccessTokenAsync(accessTokenUrl, authToken, Constants.GRANT_TYPE_AUTH_CODE);
-            
-            if (result != null)
-            {
-                OAuthState = OAuthState.SUCCEEDED;
-                AccessToken = result.Token;
-                return true;
-            }
-            else
-            {
-                OAuthState = OAuthState.FAILED;
-                return false;
-            }        
         }
 
         /// <summary>
@@ -90,9 +47,9 @@ namespace uniauth_net.oauth2
             initOAuthorizer(clientSecret);
             
             base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
-            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, "code");
-            viewer.AuthorizeUrl = new Uri(authorizeUrlResponse);
+            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.RESPONSE_TYPE_CODE);            
             viewer.AuthController = this;
+            viewer.AuthorizeUrl = new Uri(authorizeUrlResponse);
         }
 
         /// <summary>
@@ -103,7 +60,7 @@ namespace uniauth_net.oauth2
         /// <returns>True if the given url is callback url</returns>
         public virtual bool IsCallBack(Uri currentUrl)
         {
-            if (redirectUrl.Equals("oob"))
+            if (redirectUrl.Equals(Constants.OUT_OF_BOUNDS))
                 return false;
 
             Uri callBackUrl = new Uri(redirectUrl);
@@ -147,65 +104,7 @@ namespace uniauth_net.oauth2
                 OAuthState = OAuthState.FAILED;
                 throw ex;
             }
-        }
-        
-        public async Task<bool> RefreshAccessToken()
-        {
-            //initialize the underlying OAuthorizer
-            if (oauthorizer == null)                
-                initOAuthorizer(clientSecret);
-
-            if (OAuthState != OAuthState.SUCCEEDED)
-            {
-                throw new InvalidOperationException("The request must be authorized before refresh.");
-            }
-
-            if (AccessToken == null)
-            {
-                throw new InvalidOperationException("The access token has not previously been acquired.");
-            }
-
-            if (string.IsNullOrWhiteSpace(AccessToken.RefreshToken))
-            {
-                throw new InvalidOperationException("Refresh token was not found.");
-            }
-
-            OAuthState = OAuthState.REFRESH_WAIT;
-
-            var parameters = new List<KeyValuePair<string, string>>(capacity: 6)
-                {
-                    new KeyValuePair<string,string>(Constants.REFRESH_TOKEN, this.AccessToken.RefreshToken),
-                    new KeyValuePair<string,string>(Constants.CLIENT_SECRET, this.clientSecret)
-                };
-
-            var accessTokenUrl = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.GRANT_TYPE_REFRESH_TOKEN, parameters);
-            Uri authUri = new Uri(accessTokenUrl);
-
-            OAuthState = OAuthState.ACCESS_TOKEN_WAIT;
-            try
-            {
-                var result = await oauthorizer.GetAccessTokenAsync(accessTokenUrl);
-
-                if (result != null)
-                {
-                    OAuthState = OAuthState.SUCCEEDED;  
-                    var token = result.Token;
-                    base.RestoreAccessToken(token.Code, token.Expires, token.RefreshToken);
-
-                    return true;
-                }
-                else
-                {
-                    OAuthState = OAuthState.FAILED;
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                OAuthState = OAuthState.FAILED;
-                throw ex;
-            }
-        }
+        }        
     }
 }
 

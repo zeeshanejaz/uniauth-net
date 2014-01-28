@@ -40,5 +40,6 @@ namespace AsyncOAuth.OAuth1a
         public const string OAUTH_SIGNATURE_METHOD = "oauth_signature_method";
         public const string OAUTH_VERSION = "oauth_version";
         public const string HMAC_SHA1 = "HMAC-SHA1";
+        public const string OUT_OF_BOUNDS = "oob";
     }
 }

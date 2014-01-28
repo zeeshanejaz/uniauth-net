@@ -29,7 +29,7 @@ namespace AsyncOAuth.OAuth2
         public const string LOCALHOST = "http://localhost";        
         public const string RESPONSE_TYPE = "response_type";
         public const string RESPONSE_TYPE_CODE = "code";
-        public const string RESPONSE_TYPE_token = "token";
+        public const string RESPONSE_TYPE_TOKEN = "token";
         public const string REDIRECT_URI = "redirect_uri";
         public const string CLIENT_ID = "client_id";
         public const string CLIENT_SECRET = "client_secret";
@@ -46,5 +46,8 @@ namespace AsyncOAuth.OAuth2
         public const string CODE = "code";
         public const string EXPIRES_IN = "expires_in";
         public const string REFRESH_TOKEN = "refresh_token";
+        public const string OUT_OF_BOUNDS = "oob";
+        public const string OAUTH_HEADER = "Authorization";
+        public const string OAUTH_HEADER_VALUE_FORMAT = "Bearer {0}";
     }
 }

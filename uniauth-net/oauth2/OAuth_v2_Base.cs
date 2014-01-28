@@ -99,9 +99,9 @@ namespace uniauth_net.oauth2
             }
 
             string headerVal = AccessToken.Code;
-            request.Headers.TryAddWithoutValidation("Authorization", string.Format("Bearer {0}", headerVal));
+            request.Headers.TryAddWithoutValidation(Constants.OAUTH_HEADER, string.Format(Constants.OAUTH_HEADER_VALUE_FORMAT, headerVal));
             return true;
-        }
+        }       
     }
 }
 

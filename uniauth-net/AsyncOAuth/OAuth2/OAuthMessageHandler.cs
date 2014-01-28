@@ -79,7 +79,7 @@ namespace AsyncOAuth.OAuth2
                 request.RequestUri = new System.Uri(request.RequestUri.OriginalString + newQuery);
             }
 
-            return base.SendAsync(request, cancellationToken).Result;
+            return await base.SendAsync(request, cancellationToken);
         }
     }
 }

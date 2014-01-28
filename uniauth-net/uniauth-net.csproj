@@ -74,8 +74,10 @@
     <Compile Include="AsyncOAuth\OAuth1a\OAuthMessageHandler.cs" />
     <Compile Include="AsyncOAuth\OAuth1a\OAuthUtility.cs" />
     <Compile Include="IAuthProvider.cs" />
+    <Compile Include="oauth2\OAuth_v2_ThreeLeggedBase.cs" />
     <Compile Include="oauth2\OAuth_v2_TwoLeggedUserCredentials.cs" />
     <Compile Include="oauth2\OAuth_v2_TwoLeggedResourceOwnerPassword.cs" />
+    <Compile Include="oauth2\OAuth_v2_PinBasedFlow.cs" />
     <Compile Include="oauth2\Token.cs" />
     <Compile Include="oauth2\OAuth_v2_BrowserBasedFlow.cs" />
     <Compile Include="OAuthState.cs" />

@@ -80,7 +80,7 @@ namespace AsyncOAuth.OAuth1a
             var header = headerParams.Select(p => p.Key + "=" + p.Value.Wrap("\"")).ToString(",");
             request.Headers.Authorization = new AuthenticationHeaderValue(Constants.OAUTH_HEADER_TYPE, header);
 
-            return base.SendAsync(request, cancellationToken).Result;
+            return await base.SendAsync(request, cancellationToken);
         }
     }
 }

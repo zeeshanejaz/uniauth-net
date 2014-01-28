@@ -22,6 +22,7 @@
 * THE SOFTWARE.
 /******************************************************************************/
 
+using AsyncOAuth.OAuth1a;
 using System;
 using System.Threading.Tasks;
 
@@ -101,8 +102,8 @@ namespace uniauth_net.oauth1a
 
             base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
             var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizeUrl, token);            
-            viewer.AuthorizeUrl = new Uri(authorizeUrlResponse);
             viewer.AuthController = this;
+            viewer.AuthorizeUrl = new Uri(authorizeUrlResponse);
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace uniauth_net.oauth1a
         /// <returns>True if the given url is callback url</returns>
         public virtual bool IsCallBack(Uri currentUrl)
         {
-            if (callbackUrl.Equals("oob"))
+            if (callbackUrl.EndsWith(Constants.OUT_OF_BOUNDS, StringComparison.OrdinalIgnoreCase))
                 return false;
 
             Uri callBackUrl = new Uri(callbackUrl);

@@ -22,6 +22,7 @@
 * THE SOFTWARE.
 /******************************************************************************/
 
+using AsyncOAuth.OAuth2;
 using System;
 using System.Threading.Tasks;
 
@@ -52,7 +53,7 @@ namespace uniauth_net.oauth2
             initOAuthorizer();
 
             base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
-            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, "token");
+            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.RESPONSE_TYPE_TOKEN);
             return new Uri(authorizeUrlResponse);
         }
 
@@ -66,9 +67,9 @@ namespace uniauth_net.oauth2
             initOAuthorizer();
 
             base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
-            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, "token");
-            viewer.AuthorizeUrl = new Uri(authorizeUrlResponse);
+            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.RESPONSE_TYPE_TOKEN);
             viewer.AuthController = this;
+            viewer.AuthorizeUrl = new Uri(authorizeUrlResponse);            
         }
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace uniauth_net.oauth2
         /// <returns>True if the given url is callback url</returns>
         public virtual bool IsCallBack(Uri currentUrl)
         {
-            if (redirectUrl.Equals("oob"))
+            if (redirectUrl.Equals(Constants.OUT_OF_BOUNDS))
                 return false;
 
             Uri callBackUrl = new Uri(redirectUrl);
