@@ -29,9 +29,16 @@ namespace uniauth_net.oauth2
 {
     public class OAuth_v2_BrowserBasedFlow : OAuth_v2_Base, IUserConsentHandler
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="redirectUrl"></param>
+        /// <param name="scope"></param>
+        /// <param name="authorizationUrl"></param>
         public OAuth_v2_BrowserBasedFlow(string clientId,
-            string redirectUrl, string scope, string authUrl)
-            : base(clientId, redirectUrl, scope, authUrl)
+            string redirectUrl, string scope, string authorizationUrl)
+            : base(clientId, redirectUrl, scope, authorizationUrl)
         {
         }
 
@@ -45,7 +52,7 @@ namespace uniauth_net.oauth2
             initOAuthorizer();
 
             base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
-            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authUrl, "token");
+            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, "token");
             return new Uri(authorizeUrlResponse);
         }
 
@@ -59,7 +66,7 @@ namespace uniauth_net.oauth2
             initOAuthorizer();
 
             base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
-            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authUrl, "token");
+            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, "token");
             viewer.AuthorizeUrl = new Uri(authorizeUrlResponse);
             viewer.AuthController = this;
         }

@@ -31,14 +31,14 @@ namespace uniauth_net.oauth2
 {
     public class OAuth_v2_WebServerFlow : OAuth_v2_Base, IUserConsentHandler
     {
-        private string tokenUrl = null;
+        private string accessTokenUrl = null;
         private string clientSecret = null;
 
         public OAuth_v2_WebServerFlow(string clientId, string clientSecret,
-            string redirectUrl, string scope, string authUrl, string tokenUrl)
-            : base(clientId, redirectUrl, scope, authUrl)
+            string redirectUrl, string scope, string authorizationUrl, string accessTokenUrl)
+            : base(clientId, redirectUrl, scope, authorizationUrl)
         {
-            this.tokenUrl = tokenUrl;
+            this.accessTokenUrl = accessTokenUrl;
             this.clientSecret = clientSecret;
         }
 
@@ -52,7 +52,7 @@ namespace uniauth_net.oauth2
             initOAuthorizer(clientSecret);
 
             base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
-            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authUrl, Constants.RESPONSE_TYPE_CODE);
+            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.RESPONSE_TYPE_CODE);
             return new Uri(authorizeUrlResponse);
         }
 
@@ -65,7 +65,7 @@ namespace uniauth_net.oauth2
         {
             OAuthState = OAuthState.ACCESS_TOKEN_WAIT;
             authToken = new AuthToken(verifier, null);
-            var result = await oauthorizer.GetAccessTokenAsync(tokenUrl, authToken, Constants.GRANT_TYPE_AUTH_CODE);
+            var result = await oauthorizer.GetAccessTokenAsync(accessTokenUrl, authToken, Constants.GRANT_TYPE_AUTH_CODE);
             
             if (result != null)
             {
@@ -90,7 +90,7 @@ namespace uniauth_net.oauth2
             initOAuthorizer(clientSecret);
             
             base.OAuthState = OAuthState.AUTH_TOKEN_WAIT;
-            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authUrl, "code");
+            var authorizeUrlResponse = oauthorizer.BuildAuthorizeUrl(authorizationUrl, "code");
             viewer.AuthorizeUrl = new Uri(authorizeUrlResponse);
             viewer.AuthController = this;
         }
@@ -128,7 +128,7 @@ namespace uniauth_net.oauth2
             OAuthState = OAuthState.ACCESS_TOKEN_WAIT;
             try
             {
-                var result = await oauthorizer.GetAccessTokenAsync(tokenUrl, authToken, Constants.GRANT_TYPE_AUTH_CODE);
+                var result = await oauthorizer.GetAccessTokenAsync(accessTokenUrl, authToken, Constants.GRANT_TYPE_AUTH_CODE);
 
                 if (result != null)
                 {
@@ -178,7 +178,7 @@ namespace uniauth_net.oauth2
                     new KeyValuePair<string,string>(Constants.CLIENT_SECRET, this.clientSecret)
                 };
 
-            var accessTokenUrl = oauthorizer.BuildAuthorizeUrl(authUrl, Constants.GRANT_TYPE_REFRESH_TOKEN, parameters);
+            var accessTokenUrl = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.GRANT_TYPE_REFRESH_TOKEN, parameters);
             Uri authUri = new Uri(accessTokenUrl);
 
             OAuthState = OAuthState.ACCESS_TOKEN_WAIT;

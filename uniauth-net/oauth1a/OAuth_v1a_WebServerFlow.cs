@@ -31,8 +31,17 @@ namespace uniauth_net.oauth1a
     {
         protected string authorizeUrl = null; 
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <param name="callbackUrl"></param>
+        /// <param name="requestTokenUrl"></param>
+        /// <param name="accessTokenUrl"></param>
+        /// <param name="authorizeUrl"></param>
         public OAuth_v1a_WebServerFlow(string clientId, string clientSecret,
-            string callbackUrl, string requestTokenUrl, string accessTokenUrl, string authorizeUrl)
+            string callbackUrl, string requestTokenUrl, string authorizeUrl, string accessTokenUrl)
             : base(clientId, clientSecret, callbackUrl, requestTokenUrl, accessTokenUrl)
         {
             this.authorizeUrl = authorizeUrl;

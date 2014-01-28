@@ -35,11 +35,21 @@ namespace uniauth_net.oauth2
         private string password = null;
         private string clientSecret = null;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <param name="redirectUrl"></param>
+        /// <param name="scope"></param>
+        /// <param name="authorizationUrl"></param>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
         public OAuth_v2_TwoLeggedResourceOwnerPassword(
             string clientId, string clientSecret,
-            string redirectUrl, string scope, string authUrl,
+            string redirectUrl, string scope, string authorizationUrl,
             string userName, string password)
-            : base(clientId, redirectUrl, scope, authUrl)
+            : base(clientId, redirectUrl, scope, authorizationUrl)
         {
             this.userName = userName;
             this.password = password;
@@ -63,7 +73,7 @@ namespace uniauth_net.oauth2
                     new KeyValuePair<string,string>(Constants.CLIENT_SECRET, this.clientSecret)
                 };
 
-            var accessTokenUrl = oauthorizer.BuildAuthorizeUrl(authUrl, Constants.GRANT_TYPE_PASSWORD, parameters);
+            var accessTokenUrl = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.GRANT_TYPE_PASSWORD, parameters);
             Uri authUri = new Uri(accessTokenUrl);
 
             OAuthState = OAuthState.ACCESS_TOKEN_WAIT;

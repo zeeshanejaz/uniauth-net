@@ -31,18 +31,14 @@ namespace uniauth_net.oauth2
 {
     public class OAuth_v2_TwoLeggedUserCredentials : OAuth_v2_Base
     {
-        private string userName = null;
-        private string password = null;
         private string clientSecret = null;
 
         public OAuth_v2_TwoLeggedUserCredentials(
             string clientId, string clientSecret,
-            string redirectUrl, string scope, string authUrl,
-            string userName, string password)
-            : base(clientId, redirectUrl, scope, authUrl)
+            string redirectUrl, string scope, string authorizationUrl)
+            : base(clientId, redirectUrl, scope, authorizationUrl)
         {
-            this.userName = userName;
-            this.password = password;
+
             this.clientSecret = clientSecret;
         }
 
@@ -61,7 +57,7 @@ namespace uniauth_net.oauth2
                     new KeyValuePair<string,string>(Constants.CLIENT_SECRET, this.clientSecret)
                 };
 
-            var accessTokenUrl = oauthorizer.BuildAuthorizeUrl(authUrl, Constants.GRANT_TYPE_CLIENT_CREDENTIALS, parameters);
+            var accessTokenUrl = oauthorizer.BuildAuthorizeUrl(authorizationUrl, Constants.GRANT_TYPE_CLIENT_CREDENTIALS, parameters);
             Uri authUri = new Uri(accessTokenUrl);
 
             OAuthState = OAuthState.ACCESS_TOKEN_WAIT;

@@ -40,7 +40,7 @@ namespace uniauth_net.oauth2
 
         protected string clientId = null;
         protected string redirectUrl = null;
-        protected string authUrl = null;
+        protected string authorizationUrl = null;
         protected string scope = null;
 
         public void RestoreAccessToken(string accessToken, string expiresIn = null, string refreshToken = null)
@@ -56,12 +56,12 @@ namespace uniauth_net.oauth2
             this.AccessToken = new AccessToken(accessToken, parameters.ToLookup(kvp => kvp.Key, kvp => kvp.Value));
         }
 
-        protected OAuth_v2_Base(string clientId, string redirectUrl, string scope, string authUrl)
+        protected OAuth_v2_Base(string clientId, string redirectUrl, string scope, string authorizationUrl)
         {
             this.clientId = clientId;         
             this.redirectUrl = redirectUrl;         
             this.scope = scope;
-            this.authUrl = authUrl;
+            this.authorizationUrl = authorizationUrl;
             OAuthState = OAuthState.INITIALIZED;
         }
         

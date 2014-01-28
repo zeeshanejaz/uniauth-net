@@ -32,6 +32,14 @@ namespace uniauth_net.oauth1a
         protected string requestTokenUrl = null;        
         protected string accessTokenUrl = null;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <param name="callbackUrl"></param>
+        /// <param name="requestTokenUrl"></param>
+        /// <param name="accessTokenUrl"></param>
         public OAuth_v1a_TwoLeggedFlow(string clientId, string clientSecret,
             string callbackUrl, string requestTokenUrl, string accessTokenUrl)
             :base(clientId, clientSecret, callbackUrl)
