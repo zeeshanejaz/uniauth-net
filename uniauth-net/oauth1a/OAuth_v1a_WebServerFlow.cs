@@ -128,10 +128,12 @@ namespace uniauth_net.oauth1a
         /// <summary>
         /// The resultant callback url to process as the result of authorization.
         /// </summary>
-        /// <param name="authorizedUrl">The return url sent back with key and secret</param>
+        /// <param name="currentUrl">The return url sent back with key and secret</param>
         /// <returns>True if the process of authorization was successful</returns>
-        public async virtual Task<bool> ProcessUserAuthorizationAsync(Uri authorizedUrl)
+        public async virtual Task<bool> ProcessUserAuthorizationAsync(Uri currentUrl)
         {
+            var authorizedUrl = currentUrl.ProcessIEUrlErrors();
+
             OAuthState = OAuthState.ACCESS_TOKEN_WAIT;
             try
             {

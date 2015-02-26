@@ -62,22 +62,20 @@ namespace uniauth_net.oauth2
         {
             if (redirectUrl.Equals(Constants.OUT_OF_BOUNDS))
                 return false;
-
-            Uri callBackUrl = new Uri(redirectUrl);
-            UriComponents components = (UriComponents.SchemeAndServer | UriComponents.Path);
-
-            string value1 = currentUrl.GetComponents(components, UriFormat.Unescaped);
-            string value2 = callBackUrl.GetComponents(components, UriFormat.Unescaped);
-            return string.Equals(value1, value2, StringComparison.Ordinal);
+            
+            string value1 = currentUrl.ToString().ToLowerInvariant();
+            string value2 = redirectUrl.ToString().ToLowerInvariant();
+            return (value1.IndexOf(value2) >= 0);
         }
 
         /// <summary>
         /// The resultant callback url to process as the result of authorization.
         /// </summary>
-        /// <param name="authorizedUrl">The return url sent back with key and secret</param>
+        /// <param name="currentUrl">The return url sent back with key and secret</param>
         /// <returns>True if the process of authorization was successful</returns>
-        public async virtual Task<bool> ProcessUserAuthorizationAsync(Uri authorizedUrl)
+        public async virtual Task<bool> ProcessUserAuthorizationAsync(Uri currentUrl)
         {
+            var authorizedUrl = currentUrl.ProcessIEUrlErrors();
             OAuthState = OAuthState.AUTH_TOKEN_WAIT;
             var output = oauthorizer.GetAuthTokenFromResponse(authorizedUrl);
             authToken = output.Token;

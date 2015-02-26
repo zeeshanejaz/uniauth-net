@@ -94,12 +94,13 @@ namespace uniauth_net.oauth2
         /// <summary>
         /// The resultant callback url to process as the result of authorization.
         /// </summary>
-        /// <param name="authorizedUrl">The return url sent back with key and secret</param>
+        /// <param name="currentUrl">The return url sent back with key and secret</param>
         /// <returns>True if the process of authorization was successful</returns>
-        public async virtual Task<bool> ProcessUserAuthorizationAsync(Uri authorizedUrl)
+        public async virtual Task<bool> ProcessUserAuthorizationAsync(Uri currentUrl)
         {
             try
             {
+                var authorizedUrl = currentUrl.ProcessIEUrlErrors();
                 var result = oauthorizer.GetAccessTokenFromResponse(authorizedUrl);
 
                 if (result != null)
