@@ -60,12 +60,13 @@ namespace uniauth_net.oauth2
         /// <returns>True if the given url is callback url</returns>
         public virtual bool IsCallBack(Uri currentUrl)
         {
+            var processedUrl = currentUrl.ProcessIEUrlErrors();
             if (redirectUrl.Equals(Constants.OUT_OF_BOUNDS))
                 return false;
-            
-            string value1 = currentUrl.ToString().ToLowerInvariant();
+
+            string value1 = processedUrl.ToString().ToLowerInvariant();
             string value2 = redirectUrl.ToString().ToLowerInvariant();
-            return (value1.IndexOf(value2) >= 0);
+            return value1.StartsWith(value2);
         }
 
         /// <summary>
