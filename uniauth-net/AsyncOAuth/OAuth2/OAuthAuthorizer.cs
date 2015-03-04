@@ -213,7 +213,8 @@ namespace AsyncOAuth.OAuth2
                     new KeyValuePair<string,string>(Constants.CODE, authToken.Code),
                     new KeyValuePair<string,string>(Constants.CLIENT_SECRET, clientSecret),                    
                     new KeyValuePair<string,string>(Constants.REDIRECT_URI, redirectUrl),
-                    new KeyValuePair<string, string>(Constants.GRANT_TYPE, grantType)
+                    new KeyValuePair<string, string>(Constants.GRANT_TYPE, grantType),
+                    new KeyValuePair<string, string>(Constants.SCOPE, scope)
                 };
 
             if (parameters == null) parameters = Enumerable.Empty<KeyValuePair<string, string>>();
