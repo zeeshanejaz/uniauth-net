@@ -23,8 +23,10 @@
 * THE SOFTWARE.
 /******************************************************************************/
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -47,7 +49,7 @@ namespace AsyncOAuth.OAuth2
             this.scope = string.Empty;
             this.redirectUrl = Constants.LOCALHOST;
         }
-                
+
         public OAuthAuthorizer(string consumerKey, string consumerSecret, string redirectUrl, string scope)
             : this(consumerKey, consumerSecret)
         {
@@ -55,7 +57,7 @@ namespace AsyncOAuth.OAuth2
             this.scope = scope;
         }
 
-        public OAuthAuthorizer(string consumerKey, string redirectUrl, string scope)            
+        public OAuthAuthorizer(string consumerKey, string redirectUrl, string scope)
         {
             this.clientId = consumerKey;
             this.clientSecret = null;
@@ -77,8 +79,8 @@ namespace AsyncOAuth.OAuth2
             return tokenResponse;
         }
 
-        private TokenResponse<T> GetTokenResponseFromFragment<T> (
-            Uri url, string tokenName, Func<string, ILookup<string, string>, T> tokenFactory) 
+        private TokenResponse<T> GetTokenResponseFromFragment<T>(
+            Uri url, string tokenName, Func<string, ILookup<string, string>, T> tokenFactory)
             where T : Token
         {
             var tokenBase = url.Fragment;
@@ -102,26 +104,40 @@ namespace AsyncOAuth.OAuth2
         private static TokenResponse<T> extractTokenAndExtraDataJson<T>(string tokenName,
             Func<string, ILookup<string, string>, T> tokenFactory, string tokenBase) where T : Token
         {
-            var splitted = tokenBase.Replace(" : ",":").Replace("\"", "")
-                .Split(new char[] {'{', '}', ' ', '\r', '\n', '\t'}, StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => s.Split(':')).ToLookup(xs => xs[0], xs => xs[1]);
 
-            var code = splitted[tokenName].First().UrlDecode();
-                       
-            var extraData = splitted.Where(kvp => kvp.Key != tokenName)
-                .SelectMany(g => g, (g, value) => new { g.Key, Value = value })
-                .ToLookup(kvp => kvp.Key, kvp => kvp.Value);
-            var token = tokenFactory(code, extraData);
+            //Convert to dictionary
+            var results = JsonConvert.DeserializeObject<Dictionary<string,dynamic>>(tokenBase);
+            
+            //Find access token
+            string accessToken = null;
+            Dictionary<string,string> extraData = new Dictionary<String,String>();
+            foreach (var item in results)
+	        {
+               if(item.Key.Equals(tokenName)){
+                   accessToken = item.Value as string;
+                   continue;
+               }if( item.Value is string){
 
+                   extraData.Add(item.Key,item.Value as string);
+                }else if(item.Value is int){
+                    var val = item.Value as int?;
+                    if(val.HasValue){
+                         extraData.Add(item.Key,val.ToString());
+                    }                  
+                }
+	        }
+         
+            var data= extraData.ToLookup(kv=> kv.Key, kv=> kv.Value)
+            var token = tokenFactory(accessToken, data)
             return new TokenResponse<T>(token);
         }
 
-        private static TokenResponse<T> extractTokenAndExtraData<T>(string tokenName, 
+        private static TokenResponse<T> extractTokenAndExtraData<T>(string tokenName,
             Func<string, ILookup<string, string>, T> tokenFactory, string tokenBase) where T : Token
         {
             var splitted = tokenBase.Split('&').Select(s => s.Split('=')).ToLookup(xs => xs[0], xs => xs[1]);
             var code = splitted[tokenName].First().UrlDecode();
-                        
+
             var extraData = splitted.Where(kvp => kvp.Key != tokenName)
                 .SelectMany(g => g, (g, value) => new { g.Key, Value = value })
                 .ToLookup(kvp => kvp.Key, kvp => kvp.Value);
@@ -133,7 +149,7 @@ namespace AsyncOAuth.OAuth2
         /// <summary>
         /// Build Authorization Url
         /// </summary>
-        public string BuildAuthorizeUrl(string authUrl, 
+        public string BuildAuthorizeUrl(string authUrl,
             string responseType, IEnumerable<KeyValuePair<string, string>> optionalParameters = null)
         {
             Precondition.NotNull(authUrl, "authUrl");
@@ -165,7 +181,7 @@ namespace AsyncOAuth.OAuth2
         {
             var client = new HttpClient(handler);
 
-            var response = await client.PostAsync(url, 
+            var response = await client.PostAsync(url,
                 postValue ?? new FormUrlEncodedContent(Enumerable.Empty<KeyValuePair<string, string>>()));
 
             var tokenBase = await response.Content.ReadAsStringAsync();
@@ -174,7 +190,7 @@ namespace AsyncOAuth.OAuth2
             {
                 throw new HttpRequestException(response.StatusCode + ":" + tokenBase); // error message
             }
-            
+
             if (tokenBase.Contains(Constants.ACCESS_TOKEN))
             {
                 if (tokenBase.IsJson())
@@ -187,7 +203,7 @@ namespace AsyncOAuth.OAuth2
         }
 
         /// <summary>asynchronus get GetAccessToken</summary>
-        public async Task<TokenResponse<AccessToken>> GetAccessTokenAsync(string accessTokenUrl, 
+        public async Task<TokenResponse<AccessToken>> GetAccessTokenAsync(string accessTokenUrl,
             IEnumerable<KeyValuePair<string, string>> parameters = null, HttpContent postValue = null)
         {
             Precondition.NotNull(accessTokenUrl, "accessTokenUrl");
@@ -197,9 +213,9 @@ namespace AsyncOAuth.OAuth2
 
             return await GetTokenResponseAsync(accessTokenUrl, handler, postValue, tokenFactory: (code, data) => new AccessToken(code, data));
         }
-        
+
         /// <summary>asynchronus get GetAccessToken</summary>
-        public async Task<TokenResponse<AccessToken>> GetAccessTokenAsync(string accessTokenUrl, AuthToken authToken, 
+        public async Task<TokenResponse<AccessToken>> GetAccessTokenAsync(string accessTokenUrl, AuthToken authToken,
             string grantType, IEnumerable<KeyValuePair<string, string>> parameters = null, HttpContent postValue = null)
         {
             Precondition.NotNull(accessTokenUrl, "accessTokenUrl");
@@ -213,12 +229,13 @@ namespace AsyncOAuth.OAuth2
                     new KeyValuePair<string,string>(Constants.CODE, authToken.Code),
                     new KeyValuePair<string,string>(Constants.CLIENT_SECRET, clientSecret),                    
                     new KeyValuePair<string,string>(Constants.REDIRECT_URI, redirectUrl),
-                    new KeyValuePair<string, string>(Constants.GRANT_TYPE, grantType)
+                    new KeyValuePair<string, string>(Constants.GRANT_TYPE, grantType),
+                    new KeyValuePair<string, string>(Constants.SCOPE, scope)
                 };
 
             if (parameters == null) parameters = Enumerable.Empty<KeyValuePair<string, string>>();
             var handler = new OAuthMessageHandler(clientId, redirectUrl, optionalParameters: parameters.Concat(sendParameters));
-            
+
             return await GetTokenResponseAsync(accessTokenUrl, handler, postValue, (code, data) => new AccessToken(code, data));
         }
     }
